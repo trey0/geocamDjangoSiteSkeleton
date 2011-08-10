@@ -102,7 +102,7 @@ def fillTemplate(inputFile, outputFile, context):
         logging.warning('WARNING: File %s exists, not overwriting. Move current version out of the way to regenerate' % outputFile)
         return
 
-    logging.info('generating %s' % SETTINGS_NAME)
+    logging.info('generating %s' % outputFile)
 
     from django.template import Template, Context
     from django.conf import settings
