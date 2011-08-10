@@ -9,7 +9,13 @@ import os
 import sys
 
 # try to bootstrap before hooking into django management stuff
-ret = os.spawnl(os.P_WAIT, sys.executable, sys.executable, '%s/management/bootstrap.py' % os.path.dirname(__file__), '-v')
+if 'bootstrap' in sys.argv:
+    extraArgs = sys.argv[2:]
+else:
+    extraArgs = []
+ret = os.spawnl(os.P_WAIT, sys.executable, sys.executable,
+                '%s/management/bootstrap.py' % os.path.dirname(__file__),
+                *extraArgs)
 if ret != 0:
     sys.exit(ret)
 
