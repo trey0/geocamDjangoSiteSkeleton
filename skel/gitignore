@@ -1,6 +1,4 @@
 *.pyc
-dev.db
-settings.py
 media/ugc
 docs/_build/
 src/
@@ -10,3 +8,8 @@ media/css/*.r*.css
 *DS_Store
 *.egg-info
 *~
+/sourceme.sh
+/dev.db
+/settings.py
+/sourcme.sh
+/build/
