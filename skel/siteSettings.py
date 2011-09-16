@@ -23,6 +23,11 @@ import os, sys
 #PROJ_ROOT = os.path.abspath(os.path.dirname(__file__))
 PROJ_ROOT = os.path.abspath(os.path.dirname(__file__))
 
+SCRIPT_NAME = os.environ['DJANGO_SCRIPT_NAME'] # set in sourceme.sh
+if USING_DJANGO_DEV_SERVER:
+    # django dev server deployment won't work with other SCRIPT_NAME settings
+    SCRIPT_NAME = '/'
+            
 # Python path is agnostic to what the site-level dir is. It also prefers the
 # checked-out version of an app over the standard python install locations.
 sys.path.append(PROJ_ROOT)
@@ -59,29 +64,31 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(PROJ_ROOT, "media")
+MEDIA_ROOT = os.path.join(PROJ_ROOT, "build", "media", "")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/static/'
+MEDIA_URL = SCRIPT_NAME + 'media/'
 
 # Absolute path to the directory that holds data. This is different than media
 # in that it's uploaded/processed data that's not needed for the operation of
 # the site, but may need to be network-accessible, or be linked to from the
 # database. Examples: images, generate kml files, etc.
-# Example: "/data"
-# DATA_ROOT = os.path.join(PROJ_ROOT, 'data')
+# Example: "/data/"
+DATA_ROOT = os.path.join(PROJ_ROOT, "data", "")
+
+DATA_DIR = DATA_ROOT # some legacy modules use the DATA_DIR name
 
 # URL that handles the data served from DATA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://data.lawrence.com", "http://example.com/data/"
-# DATA_URL = '/data/'
+DATA_URL = SCRIPT_NAME + "data/"
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/static/admin/'
+ADMIN_MEDIA_PREFIX = SCRIPT_NAME + 'admin_media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '$$$$SECRET_KEY$$$$'
@@ -94,9 +101,12 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'geocamUtil.middleware.LogErrorsMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'geocamUtil.middleware.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -114,6 +124,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
 
+    'geocamUtil',
+
     # Put your installed apps here!
-    # 'xgdsAwesome'
+    # 'geocamAwesome'
 )
+
+GEOCAM_UTIL_SECURITY_ENABLED = not USING_DJANGO_DEV_SERVER
+GEOCAM_UTIL_SECURITY_SSL_REQUIRED_BY_DEFAULT = False
+GEOCAM_UTIL_SECURITY_REQUIRE_ENCRYPTED_PASSWORDS = False
+GEOCAM_UTIL_SECURITY_LOGIN_REQUIRED_BY_DEFAULT = 'write'
