@@ -18,16 +18,18 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-import os, sys
+import os
+import sys
 #APP = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 #PROJ_ROOT = os.path.abspath(os.path.dirname(__file__))
 PROJ_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-SCRIPT_NAME = os.environ['DJANGO_SCRIPT_NAME'] # set in sourceme.sh
+SCRIPT_NAME = os.environ['DJANGO_SCRIPT_NAME']  # set in sourceme.sh
+USING_DJANGO_DEV_SERVER = ('runserver' in sys.argv)
 if USING_DJANGO_DEV_SERVER:
     # django dev server deployment won't work with other SCRIPT_NAME settings
     SCRIPT_NAME = '/'
-            
+
 # Python path is agnostic to what the site-level dir is. It also prefers the
 # checked-out version of an app over the standard python install locations.
 sys.path.append(PROJ_ROOT)
@@ -78,7 +80,7 @@ MEDIA_URL = SCRIPT_NAME + 'media/'
 # Example: "/data/"
 DATA_ROOT = os.path.join(PROJ_ROOT, "data", "")
 
-DATA_DIR = DATA_ROOT # some legacy modules use the DATA_DIR name
+DATA_DIR = DATA_ROOT  # some legacy modules use the DATA_DIR name
 
 # URL that handles the data served from DATA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

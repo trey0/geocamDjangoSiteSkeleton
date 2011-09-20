@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # __NO_RELICENSE__
 
+# suppress bogus warnings about redefining variables
+# pylint: disable=W0621
+
 import os, random, subprocess, sys
 
 CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -21,7 +24,7 @@ def gen_secret():
     """ Generate a site key in the same manner Django does for the settings in
     the example app. Shamelessly copied from startproject.py in the django 
     source. """
-    return ''.join([random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+    return ''.join([random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for _ in range(50)])
 
 def main(repl, dest, templ_dir):
     try:
@@ -29,7 +32,7 @@ def main(repl, dest, templ_dir):
     except OSError:
         pass
     
-    for root, dirs, files in os.walk(templ_dir):
+    for root, _dirs, files in os.walk(templ_dir):
         for filename in files:
             source_fn = os.path.join(root, filename)
             dest_fn = replace(repl, os.path.join(dest, root.replace(templ_dir, ''), replace(repl, filename)))

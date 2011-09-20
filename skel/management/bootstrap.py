@@ -59,14 +59,15 @@ ACTIONS = (dict(name='gitInitSubmodules',
            )
 ACTION_DICT = dict([(a['name'], a) for a in ACTIONS])
 
+
 def getConfirmation(opts, actionStr):
     if opts.yes:
-        sys.stdout.write(actionStr+'? [Y/n] ')
+        sys.stdout.write(actionStr + '? [Y/n] ')
         print 'y'
         return True
     else:
         while 1:
-            sys.stdout.write(actionStr+'? [Y/n] ')
+            sys.stdout.write(actionStr + '? [Y/n] ')
             response = raw_input().strip().lower()
             if not response:
                 return True
@@ -74,6 +75,7 @@ def getConfirmation(opts, actionStr):
                 return True
             elif response == 'n':
                 return False
+
 
 def dosys(cmd, continueOnError=False):
     if cmd.startswith('sudo'):
@@ -89,13 +91,15 @@ def dosys(cmd, continueOnError=False):
             logging.error('ERROR: Command returned non-zero return value %d' % ret)
             sys.exit(1)
 
+
 def writeFileMakeDir(path, text):
     dir = os.path.dirname(path)
     if not os.path.exists(dir):
         os.makedirs(dir)
     f = file(path, 'w')
-    f.write(text+'\n')
+    f.write(text + '\n')
     f.close()
+
 
 def fillTemplate(inputFile, outputFile, context):
     if os.path.exists(outputFile):
@@ -115,13 +119,16 @@ def fillTemplate(inputFile, outputFile, context):
 ######################################################################
 # ACTION DEFINITIONS
 
+
 def gitInitSubmodules(opts):
     dosys('git submodule init')
     dosys('git submodule update')
 
+
 def gitSubmodulesMasterBranch(opts):
     # avoid "(no branch)"
     dosys('git submodule foreach git checkout master')
+
 
 def linkSubmodules(opts):
     if not os.path.exists('apps'):
@@ -138,14 +145,16 @@ def linkSubmodules(opts):
             logging.debug('  %s -> %s' % (dst, relativeSrc))
             os.symlink(relativeSrc, dst)
 
+
 def hasRequirements(reqsFile):
     for line in file(reqsFile, 'r'):
         if not re.match(r'^\s*(\#.*)?$', line):
             return True
     return False
 
+
 def installRequirements(reqsFile):
-    needSudo = not os.environ.has_key('VIRTUAL_ENV')
+    needSudo = 'VIRTUAL_ENV' not in os.environ
     if needSudo:
         sudoStr = 'sudo '
     else:
@@ -154,16 +163,20 @@ def installRequirements(reqsFile):
         dosys('%spip install -r %s' % (sudoStr, reqsFile))
     else:
         logging.info('requirements file %s is empty' % reqsFile)
-    
+
+
 def installSubModuleRequirements(opts):
     for reqs in glob('submodules/*/requirements.txt'):
         installRequirements(reqs)
 
+
 def installSiteRequirements(opts):
     installRequirements('management/siteRequirements.txt')
 
+
 def needSourceme(opts):
     return not os.path.exists(SOURCEME_NAME)
+
 
 def genSourceme(opts):
     fillTemplate('management/templates/%s' % SOURCEME_NAME,
@@ -173,8 +186,10 @@ def genSourceme(opts):
                       appsDir=os.path.abspath('apps')
                       ))
 
+
 def needSettings(opts):
     return not os.path.exists(SETTINGS_NAME)
+
 
 def genSettings(opts):
     secretKey = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
@@ -182,6 +197,7 @@ def genSettings(opts):
     fillTemplate('management/templates/%s' % SETTINGS_NAME,
                  SETTINGS_NAME,
                  dict(secretKey=secretKey))
+
 
 def needAction(opts, action):
     statusFile = STATUS_PATH_TEMPLATE % action['name']
@@ -193,9 +209,10 @@ def needAction(opts, action):
 ######################################################################
 # TOP-LEVEL CODE
 
+
 def doAction(opts, action):
     status = 'NEEDED'
-    
+
     # check if we need to do the action
     neededName = action.get('needed', None)
     if neededName:
@@ -216,12 +233,12 @@ def doAction(opts, action):
         else:
             logging.info('Skipping step %s, status is %s' % (action['name'], status))
             return
-    
+
     # confirm with user
-    if (opts.retry or action.has_key('confirm')) and not getConfirmation(opts, action['desc']):
+    if (opts.retry or 'confirm' in action) and not getConfirmation(opts, action['desc']):
         writeFileMakeDir(STATUS_PATH_TEMPLATE % action['name'], 'UNWANTED')
         return
-            
+
     # do the action
     actionFunc = globals()[action['name']]
     actionFunc(opts)
@@ -229,6 +246,7 @@ def doAction(opts, action):
     # mark completion (unless special check function is defined)
     if not neededName:
         writeFileMakeDir(STATUS_PATH_TEMPLATE % action['name'], 'DONE')
+
 
 def doit(opts, args):
     os.chdir(opts.siteDir)
@@ -238,7 +256,7 @@ def doit(opts, args):
 
     logging.basicConfig(level=(logging.WARNING - opts.verbose * 10),
                         format='%(message)s')
-    
+
     if args:
         for arg in args:
             if arg not in ACTION_DICT:
@@ -248,7 +266,7 @@ def doit(opts, args):
         actions = [ACTION_DICT[arg] for arg in args]
     else:
         actions = ACTIONS
-    
+
     logging.info('Working in %s' % os.getcwd())
     for action in ACTIONS:
         doAction(opts, action)
@@ -261,6 +279,7 @@ def doit(opts, args):
     sys.path.insert(0, os.path.dirname(opts.siteDir))
     from $$$$SITE_NAME$$$$.djangoWsgi import getEnvironmentFromSourceMe
     getEnvironmentFromSourceMe()
+
 
 def main():
     import optparse

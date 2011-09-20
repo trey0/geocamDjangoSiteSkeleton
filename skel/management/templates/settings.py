@@ -13,9 +13,7 @@ site default settings and overrides nothing.
 This file should *not* be checked into git.
 """
 
-import sys
-
-from siteSettings import *
+from siteSettings import *  # pylint: disable=W0401
 
 # Make this unique, and don't share it with anybody.  Used by Django's
 # cookie-based authentication mechanism.
