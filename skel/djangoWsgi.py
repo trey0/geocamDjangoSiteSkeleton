@@ -8,24 +8,34 @@ import os
 import sys
 import tempfile
 import re
-from django.core.handlers.wsgi import WSGIHandler
 
 
 def getEnvironmentFromSourceMe(d='.'):
     # pick up environment variables from sourceme
-    fd, tmp = tempfile.mkstemp('djangoWsgiSourceMe.txt')
+    fd, varsFile = tempfile.mkstemp('djangoWsgiSourceMe.txt')
     os.close(fd)
-    os.system('bash -c "(source %s/sourceme.sh && printenv > %s)"' % (d, tmp))
-    varsIn = file(tmp, 'r')
+
+    ret = os.system('bash -c "(source %s/sourceme.sh && printenv > %s)"' % (d, varsFile))
+    if ret != 0:
+        varsFile = '%s/vars.txt' % d
+        print >> sys.stderr, 'djangoWsgi.py: could not auto-generate environment from sourceme.sh, trying to fall back to manually generated file %s' % varsFile
+        # fallback: user can manually generate vars.txt file by sourcing sourceme.sh and running 'printenv > vars.txt'
+
+    varsIn = file(varsFile, 'r')
     for line in varsIn:
         line = line[:-1]  # chop final cr
         var, val = line.split('=', 1)
         os.environ[var] = val
     varsIn.close()
     try:
-        os.unlink(tmp)
+        os.unlink(varsFile)
     except OSError:
         pass
+
+    # set up virtualenv if needed
+    if 'VIRTUAL_ENV' in os.environ:
+        activateFile = '%s/bin/activate_this.py' % os.environ['VIRTUAL_ENV']
+        execfile(activateFile, {'__file__': activateFile})
 
     # add any new entries from PYTHONPATH to Python's sys.path
     if 'PYTHONPATH' in os.environ:
@@ -56,4 +66,5 @@ getEnvironmentFromSourceMe(thisDir)
 if os.path.exists(os.path.join(thisDir, 'DOWN_FOR_MAINTENANCE')):
     application = downForMaintenance
 else:
+    from django.core.handlers.wsgi import WSGIHandler
     application = WSGIHandler()
