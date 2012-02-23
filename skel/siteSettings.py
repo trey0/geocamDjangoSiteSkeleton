@@ -119,17 +119,20 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Note: the order of INSTALLED_APPS affects the search order for
+# templates.  We suggest putting your apps above standard apps
+# so your apps can override templates as needed.
 INSTALLED_APPS = (
+    # Put your installed apps here!
+    # 'geocamAwesome'
+
+    'geocamUtil',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-
-    'geocamUtil',
-
-    # Put your installed apps here!
-    # 'geocamAwesome'
 )
 
 GEOCAM_UTIL_SECURITY_ENABLED = not USING_DJANGO_DEV_SERVER
