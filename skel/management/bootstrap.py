@@ -268,7 +268,7 @@ def doit(opts, args):
         actions = ACTIONS
 
     logging.info('Working in %s' % os.getcwd())
-    for action in ACTIONS:
+    for action in actions:
         doAction(opts, action)
 
     # mark overall completion
