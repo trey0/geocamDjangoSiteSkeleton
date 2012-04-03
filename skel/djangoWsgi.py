@@ -24,6 +24,8 @@ def getEnvironmentFromSourceMe(d='.'):
     varsIn = file(varsFile, 'r')
     for line in varsIn:
         line = line[:-1]  # chop final cr
+        if '=' not in line or '=()' in line:
+            continue
         var, val = line.split('=', 1)
         os.environ[var] = val
     varsIn.close()
