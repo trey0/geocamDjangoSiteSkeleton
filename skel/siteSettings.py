@@ -87,10 +87,11 @@ DATA_DIR = DATA_ROOT  # some legacy modules use the DATA_DIR name
 # Examples: "http://data.lawrence.com", "http://example.com/data/"
 DATA_URL = SCRIPT_NAME + "data/"
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = SCRIPT_NAME + 'admin_media/'
+STATIC_ROOT = os.path.join(PROJ_ROOT, "build", "static", "")
+STATIC_URL = SCRIPT_NAME + 'static/'
+
+# Awesome. Needed in Django 1.3 but causes deprecation warning in Django 1.4.
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '$$$$SECRET_KEY$$$$'
