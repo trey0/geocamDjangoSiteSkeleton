@@ -16,6 +16,8 @@
 #
 # This file *should* be checked into git.
 
+from django.conf import global_settings
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 import os
@@ -98,9 +100,8 @@ SECRET_KEY = '$$$$SECRET_KEY$$$$'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -111,6 +112,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'geocamUtil.middleware.SecurityMiddleware',
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (global_settings.TEMPLATE_CONTEXT_PROCESSORS
+                               + ('django.core.context_processors.request',
+                                  'django.core.context_processors.static',
+                                  'geocamUtil.context_processors.AuthUrlsContextProcessor.AuthUrlsContextProcessor',
+                                  ))
 
 ROOT_URLCONF = 'urls'
 
@@ -140,3 +147,5 @@ GEOCAM_UTIL_SECURITY_ENABLED = not USING_DJANGO_DEV_SERVER
 GEOCAM_UTIL_SECURITY_SSL_REQUIRED_BY_DEFAULT = False
 GEOCAM_UTIL_SECURITY_REQUIRE_ENCRYPTED_PASSWORDS = False
 GEOCAM_UTIL_SECURITY_LOGIN_REQUIRED_BY_DEFAULT = 'write'
+
+GEOCAM_UTIL_INSTALLER_USE_SYMLINKS = True
