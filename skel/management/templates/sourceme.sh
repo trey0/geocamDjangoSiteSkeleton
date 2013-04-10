@@ -20,3 +20,11 @@ export PYTHONPATH={{ parentDir }}:{{ appsDir }}:$PYTHONPATH
 
 # You should not need to change this.
 export DJANGO_SETTINGS_MODULE='$$$$SITE_NAME$$$$.settings'
+
+# Avoid Mountain Lion-specific problem with LANG env variable
+if [ -x "/usr/bin/sw_vers" ]; then
+  sw_vers | grep 10.8 > /dev/null
+  if [ "$?" == "0" ]; then
+    export LANG="en_US.UTF-8"
+  fi
+fi
